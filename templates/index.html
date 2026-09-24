@@ -161,7 +161,7 @@
         <section class="hero">
             <div class="eyebrow">Computer Vision Project</div>
             <h1>See the face. <span class="gradient">Estimate the story.</span></h1>
-            <p>Upload a clear face image and let two custom CNN models estimate age and gender in seconds. Built with Python, Flask, OpenCV and TensorFlow.</p>
+            <p>Upload a clear face image and let two custom CNN models estimate age and gender in seconds. Built with Python, Flask, OpenCV and a lightweight NumPy inference runtime.</p>
         </section>
 
         <section class="workspace">
@@ -230,7 +230,7 @@
         </section>
 
         <section class="features">
-            <div class="feature"><div class="feature-icon">⚡</div><strong>Fast inference</strong><p>Models are loaded once when Flask starts, keeping individual predictions lightweight.</p></div>
+            <div class="feature"><div class="feature-icon">⚡</div><strong>Fast inference</strong><p>The trained CNN weights are loaded once at startup and run with a lightweight NumPy inference engine.</p></div>
             <div class="feature"><div class="feature-icon">◈</div><strong>Custom CNNs</strong><p>Separate trained neural networks estimate age and binary gender from the same image.</p></div>
             <div class="feature"><div class="feature-icon">▣</div><strong>Simple workflow</strong><p>Upload, analyze, and view the result in one responsive interface without extra setup.</p></div>
         </section>
@@ -238,7 +238,7 @@
 
     <footer>
         <span>VisionAge • Academic / portfolio project</span>
-        <span>Python • Flask • TensorFlow • OpenCV</span>
+        <span>Python • Flask • NumPy • OpenCV</span>
     </footer>
 
     <script>

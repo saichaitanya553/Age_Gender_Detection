@@ -1,18 +1,13 @@
 import os
 import uuid
 
-# Limit TensorFlow resource usage on low-memory servers
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["TF_NUM_INTRAOP_THREADS"] = "1"
-os.environ["TF_NUM_INTEROP_THREADS"] = "1"
-
 import cv2
 import numpy as np
-import tensorflow as tf
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
-from tensorflow.keras.models import load_model
+
+from numpy_cnn import AgeCNN, GenderCNN
+
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,15 +15,13 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-tf.config.threading.set_intra_op_parallelism_threads(1)
-tf.config.threading.set_inter_op_parallelism_threads(1)
-
-# Load the trained custom CNN models once when the application starts.
-age_model = load_model(os.path.join(BASE_DIR, "age_model.h5"), compile=False)
-gender_model = load_model(os.path.join(BASE_DIR, "gender_model.h5"), compile=False)
+# Lightweight NumPy inference runtime.
+# The weights were exported from the original trained Keras CNNs.
+age_model = AgeCNN()
+gender_model = GenderCNN()
 
 
 def allowed_file(filename):
@@ -40,16 +33,15 @@ def predict_from_image(filepath):
     if img is None:
         raise ValueError("The uploaded file could not be read as an image.")
 
-    img = cv2.resize(img, (128, 128))
+    img = cv2.resize(img, (128, 128), interpolation=cv2.INTER_AREA)
     img = img.astype(np.float32) / 255.0
     img = np.expand_dims(img, axis=0)
 
-    age_prediction = age_model.predict(img, verbose=0)
-    gender_prediction = gender_model.predict(img, verbose=0)
+    age_prediction = age_model(img)
+    gender_prediction = gender_model(img)
 
     age = max(0, int(round(float(age_prediction[0][0]))))
     gender = "Female" if float(gender_prediction[0][0]) > 0.5 else "Male"
-
     return age, gender
 
 
@@ -60,7 +52,11 @@ def home():
 
 @app.route("/health")
 def health():
-    return {"status": "healthy", "service": "Age & Gender Detection API"}
+    return {
+        "status": "healthy",
+        "service": "Age & Gender Detection API",
+        "runtime": "NumPy CNN inference",
+    }
 
 
 @app.route("/predict", methods=["POST"])
