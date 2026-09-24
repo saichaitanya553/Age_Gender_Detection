@@ -1,12 +1,18 @@
 import os
 import uuid
 
+# Limit TensorFlow resource usage on low-memory servers
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["TF_NUM_INTRAOP_THREADS"] = "1"
+os.environ["TF_NUM_INTEROP_THREADS"] = "1"
+
 import cv2
 import numpy as np
+import tensorflow as tf
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
-
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +22,9 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
 
 # Load the trained custom CNN models once when the application starts.
 age_model = load_model(os.path.join(BASE_DIR, "age_model.h5"), compile=False)
