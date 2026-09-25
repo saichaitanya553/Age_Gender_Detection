@@ -10,7 +10,9 @@ short_description: CNN-based age and gender detection from face images
 
 # VisionAge — Age & Gender Detection
 
-A portfolio-ready Flask web application that estimates age and binary gender from an uploaded image using two custom CNN models.
+[![CI](https://github.com/saichaitanya553/Age_Gender_Detection/actions/workflows/ci.yml/badge.svg)](https://github.com/saichaitanya553/Age_Gender_Detection/actions/workflows/ci.yml)
+
+A lightweight computer-vision Flask web application that estimates age and binary gender from an uploaded image using two custom CNN models.
 
 ## What changed for free deployment
 
